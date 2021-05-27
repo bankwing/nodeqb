@@ -6,23 +6,23 @@
       "ES2019"
     ],
     "rootDir": "./",
-    "outDir": "./build",
+    "outDir": "./lib",
     "esModuleInterop": true,
     "strict": true,
     "allowJs": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "declaration": true
   },
   "compileOnSave": false,
   "include": [
-    "lib/**/*.json",
-    "src/**/*.json",
-    "src",
-    "src/**/*.development"
+    "src"
   ],
   "exclude": [
     "node_modules",
-    "build"
+    "**/__tests__/*"
   ]
 }
