@@ -1,8 +1,11 @@
 {
   "name": "nodeqb",
-  "version": "1.0.0-beta",
+  "version": "1.0.2-beta",
   "description": "Query builder for node mysql. Inspired concept from laravel",
-  "keywords": ["mysql query builder","larvel query builder node"],
+  "keywords": [
+    "mysql query builder",
+    "larvel query builder node"
+  ],
   "author": "",
   "main": "lib/src/index.js",
   "license": "MIT",
@@ -11,10 +14,10 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@types/mysql": "^2.15.18",
     "mysql": "^2.18.1"
   },
   "devDependencies": {
-    "@types/mysql": "^2.15.18",
     "@types/node": "^15.6.0",
     "prettier": "^2.3.0",
     "ts-node-dev": "^1.1.6",
