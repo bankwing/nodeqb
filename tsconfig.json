@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es5",
+    "lib": [
+      "ES2019"
+    ],
+    "rootDir": "./",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "strict": true,
+    "allowJs": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "compileOnSave": false,
+  "include": [
+    "lib/**/*.json",
+    "src/**/*.json",
+    "src",
+    "src/**/*.development"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
+}

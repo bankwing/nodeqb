@@ -1,0 +1,21 @@
+{
+  "name": "nodeqb",
+  "version": "1.0.0-beta",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "start": "ts-node-dev --respawn index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "typescript": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.18",
+    "@types/node": "^15.6.0",
+    "ts-node-dev": "^1.1.6"
+  }
+}
