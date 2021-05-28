@@ -1,7 +1,7 @@
 export const devConsoleLog = (a: any, b: any = '') => {
-  console.log(a, b);
+    console.log(a, b);
 };
 
 export const spaceRemover = (str: string) => {
-  return str.replace(/\s+/g, ' ');
+    return str.replace(/\s+/g, ' ');
 };
