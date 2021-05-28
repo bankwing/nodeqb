@@ -18,7 +18,9 @@
 
 ```sh
 yarn add nodeqb
-#or
+
+or
+
 node install nodeqb
 ```
 
@@ -26,12 +28,10 @@ node install nodeqb
 ## Usage
 
 ```javascript
-const NodeQB = require("nodeqb");
-//for ES6
-//import NodeQB from 'nodeqb'
+import NodeQB from "nodeqb";
 
 const db = new NodeQB({
-    database: "mysql", //connecting database `mysql | mongo`
+    database: "mysql",
     method: "pool", // preferred use pool method
     defaults: {
         orderColumn: "createdAt" //for default ordering column -> optional
