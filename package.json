@@ -3,8 +3,18 @@
   "version": "1.0.2-beta",
   "description": "Query builder for node mysql. Inspired concept from laravel",
   "keywords": [
-    "mysql query builder",
-    "larvel query builder node"
+    "mysql",
+    "laravel",
+    "query builder",
+    "nodeqb",
+    "await",
+    "async",
+    "es6",
+    "sql",
+    "where",
+    "php convert",
+    "php",
+    "mongo"
   ],
   "author": "",
   "main": "lib/src/index.js",
@@ -19,10 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^15.6.0",
-    "prettier": "^2.3.0",
     "ts-node-dev": "^1.1.6",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.2"
   }
 }
