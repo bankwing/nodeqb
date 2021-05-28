@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to nodeqb 👋</h1>
+<h1 align="center">Welcome to NodeQB</h1>
 <p align="center">
   <a href="https://www.npmjs.com/package/nodeqb" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/nodeqb.svg">
@@ -7,8 +7,9 @@
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
 </p>
-
-> Query builder for node mysql. Inspired concept from laravel
+<p align="center">
+ Query builder for node mysql. Inspired concept from laravel
+</p>
 
 ## Install
 
@@ -47,7 +48,7 @@ const db = new NodeQB({
 
 ## Author
 
-👤 **prasanth**
+**prasanth**
 
 * Github: [@prasanthreact](https://github.com/prasanthreact)
 
