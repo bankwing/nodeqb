@@ -28,7 +28,9 @@ node install nodeqb
 ## Usage
 
 ```javascript
-import NodeQB from "nodeqb";
+const NodeQB = require("nodeqb");
+//ES6
+//import NodeQB from "nodeqb";
 
 const db = new NodeQB({
     database: "mysql",
@@ -83,6 +85,17 @@ db.table('tableName').get((err,results,fields)=>{
    }
    console.log(results) //you will get result
 })
+```
+
+## Methods
+
+### **`.getQuery()`**
+
+Get the compiled final query output sql string
+```javascript
+const query = db.table('tableName').select('colA','colB').getQuery()
+console.log(query) 
+// SELECT colA,colB FROM tableName
 ```
 
 
