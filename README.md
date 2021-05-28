@@ -10,13 +10,15 @@
 
 > Query builder for node mysql. Inspired concept from laravel
 
+### Note: ***Still under testing. Don't use it on production***
+
+<br/>
+
 ## Install
 
 ```sh
 yarn add nodeqb
-
-or
-
+#or
 node install nodeqb
 ```
 
@@ -24,10 +26,12 @@ node install nodeqb
 ## Usage
 
 ```javascript
-import NodeQB from "nodeqb";
+const NodeQB = require("nodeqb");
+//for ES6
+//import NodeQB from 'nodeqb'
 
 const db = new NodeQB({
-    database: "mysql",
+    database: "mysql", //connecting database `mysql | mongo`
     method: "pool", // preferred use pool method
     defaults: {
         orderColumn: "createdAt" //for default ordering column -> optional
