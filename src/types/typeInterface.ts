@@ -140,7 +140,7 @@ export type method = 'pool' | 'default';
 
 export namespace NodeQBConnectionInterface {
   export interface Constructor {
-    database: keyof database;
+    type: keyof database;
     config: config;
     prevent?: boolean;
     defaults?: defaults;

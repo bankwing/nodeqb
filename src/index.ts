@@ -29,26 +29,26 @@ const returnModeObj: ReturnModeObjInterface = {
 
 class NodeQB {
   private _instance: MysqlConnection;
-  private _database: 'mysql';
+  private _dbType: 'mysql';
   private _config: ConnectionConfig & PoolConfig;
   private _prevent: boolean | undefined;
 
-  constructor({ database, defaults, config, method, prevent }: NodeQBConnectionInterface.Constructor) {
-    this._database = database;
+  constructor({ type, defaults, config, method, prevent }: NodeQBConnectionInterface.Constructor) {
+    this._dbType = type;
     this._config = config;
     this._prevent = prevent;
-    if (typeof connectionDB[database] === 'undefined') {
-      throw new Error(`Invalid database connection name ${database}`);
+    if (typeof connectionDB[type] === 'undefined') {
+      throw new Error(`Invalid type connection name ${type}`);
       return;
     }
-    this._instance = connectionDB[database]();
+    this._instance = connectionDB[type]();
     if (!prevent) {
       this._instance.getInstance(config, method, defaults);
     }
   }
 
   private _createNewInstance() {
-    return new NodeQB({ database: this._database, config: this._config, prevent: true });
+    return new NodeQB({ type: this._dbType, config: this._config, prevent: true });
   }
 
   create() {
