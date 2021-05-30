@@ -1,0 +1,7 @@
+/build
+/node_modules
+/.idea
+
+/index.ts
+/lib
+/test.js
