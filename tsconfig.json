@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "strict": true,
     "allowJs": true,
-    "removeComments": true,
+    "noImplicitAny": false,
     "resolveJsonModule": true,
     "types": [
       "node"
@@ -23,6 +23,7 @@
   ],
   "exclude": [
     "node_modules",
+
     "**/__tests__/*"
   ]
 }

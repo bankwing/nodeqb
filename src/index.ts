@@ -7,7 +7,7 @@ import {
     ReturnModeObjInterface,
 } from './types';
 import MysqlConnection from './database/mysql';
-import {ConnectionConfig, PoolConfig, queryCallback} from 'mysql';
+import {ConnectionConfig, PoolConfig} from 'mysql';
 import {spaceRemover} from './helper';
 
 const op = ['>', '<', '>=', '<=', '!=', '=', 'like'];
@@ -51,11 +51,11 @@ class NodeQB {
         return this._exec({callback});
     }
 
-    getAll(callback?: queryCallback) {
+    getAll(callback?: mysqlCustomQueryCallback) {
         return this._exec({callback});
     }
 
-    count(callback?: queryCallback) {
+    count(callback?: mysqlCustomQueryCallback) {
         this._instance._select = ' count(*) as c ';
         return this._exec({callback, returnMode: 'single', value: 'c'});
     }
@@ -96,7 +96,7 @@ class NodeQB {
         return spaceRemover(this._instance.getSql());
     }
 
-    first(callback?: queryCallback) {
+    first(callback?: mysqlCustomQueryCallback) {
         this._instance._limit = 'limit 1';
         return this._exec({callback, returnMode: 'single'});
     }
@@ -297,22 +297,22 @@ class NodeQB {
         return this;
     }
 
-    insert(insertObject: object, callback?: queryCallback) {
+    insert(insertObject: object, callback?: mysqlCustomQueryCallback) {
         this._instance._insert = this._conditionPrepare([insertObject], ',');
         return this._exec({callback});
     }
 
-    insertGetId(insertObject: object, callback?: queryCallback) {
+    insertGetId(insertObject: object, callback?: mysqlCustomQueryCallback) {
         this._instance._insert = this._conditionPrepare([insertObject], ',');
         return this._exec({callback, value: 'insertId', returnMode: 'insert'});
     }
 
-    update(updateObject: object, callback?: queryCallback) {
+    update(updateObject: object, callback?: mysqlCustomQueryCallback) {
         this._instance._update = this._conditionPrepare([updateObject], ',');
         return this._exec({callback});
     }
 
-    delete(callback?: queryCallback) {
+    delete(callback?: mysqlCustomQueryCallback) {
         this._instance._delete = 'DELETE';
         return this._exec({callback});
     }
@@ -322,12 +322,12 @@ class NodeQB {
         return this;
     }
 
-    truncate(callback?: queryCallback) {
+    truncate(callback?: mysqlCustomQueryCallback) {
         this._instance._sql = `TRUNCATE TABLE ${this._instance._table};`;
         return this._exec({callback, returnMode: 'insert'});
     }
 
-    drop(callback?: queryCallback) {
+    drop(callback?: mysqlCustomQueryCallback) {
         this._instance._sql = `DROP TABLE ${this._instance._table};`;
         return this._exec({callback, returnMode: 'insert'});
     }
@@ -390,17 +390,17 @@ class NodeQB {
         this._instance._queryOptionsBuild();
         const queryMode = returnModeObj[returnMode];
         if (callback) {
-            return this._instance[queryMode].call(this._instance, {
+            return this._instance[queryMode].apply(this._instance, [{
                 options: this._instance._queryOptions,
                 callback,
                 value
-            });
+            }]);
         } else {
-            return this._instance[queryMode].call(this._instance, {
+            return this._instance[queryMode].apply(this._instance, [{
                 options: this._instance._queryOptions,
                 callback,
                 value,
-            })
+            }])
         }
 
     }

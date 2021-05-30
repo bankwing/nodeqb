@@ -1,14 +1,5 @@
 import NodeQB from './index';
-import {
-    Connection,
-    ConnectionConfig,
-    FieldInfo,
-    MysqlError,
-    PoolConfig,
-    PoolConnection,
-    queryCallback,
-    QueryOptions
-} from 'mysql';
+import {Connection, ConnectionConfig, FieldInfo, MysqlError, PoolConfig, PoolConnection, QueryOptions} from 'mysql';
 import MysqlConnection from './database/mysql';
 
 export type method = 'pool' | 'default';
@@ -46,6 +37,7 @@ export type ReturnModeTypes = 'single' | 'default' | 'insert';
 export type ReturnModeObjInterface = {
     [key in ReturnModeTypes]: keyof MysqlConnection;
 };
+export type mysqlCustomQueryCallback = (err: MysqlErrorCustom | null, results?: any, fields?: FieldInfo[]) => void;
 
 export interface ExecInterface {
     returnMode?: ReturnModeTypes;
@@ -64,7 +56,7 @@ export type columns = Array<string> | Array<object>;
 
 export interface MysqlQueryMethod {
     options: QueryOptions;
-    callback?: queryCallback;
+    callback?: mysqlCustomQueryCallback;
     returnMode?: ReturnModeTypes;
     value?: any;
 }
@@ -74,14 +66,12 @@ export interface QueryExec {
     connection: PoolConnection | Connection;
     resolve: any;
     reject: any;
-    callback: any;
-    options: any;
+    callback?: mysqlCustomQueryCallback;
+    options: QueryOptions;
     returnMode?: ReturnModeTypes;
     value?: string;
 }
 
-
-export type mysqlCustomQueryCallback = (err: MysqlErrorCustom | null, results?: any, fields?: FieldInfo[]) => void;
 
 export type ExecInterfaceSingleView = {
     returnMode: 'single';
