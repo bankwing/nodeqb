@@ -2,12 +2,13 @@ import {
     columns,
     Condition,
     ExecInterface,
+    mysqlCustomQueryCallback,
     NodeQBConnectionInterface,
     ReturnModeObjInterface,
-} from './types/typeInterface';
+} from './types';
 import MysqlConnection from './database/mysql';
 import {ConnectionConfig, PoolConfig, queryCallback} from 'mysql';
-import {spaceRemover} from './helper/basicHelper';
+import {spaceRemover} from './helper';
 
 const op = ['>', '<', '>=', '<=', '!=', '=', 'like'];
 
@@ -15,11 +16,6 @@ const connectionDB = {
     mysql: () => new MysqlConnection(),
 };
 
-type ExecInterfaceSingleView = {
-    returnMode: 'single';
-    callback?: queryCallback;
-    value: string;
-};
 
 const returnModeObj: ReturnModeObjInterface = {
     single: '_singleQuery',
@@ -51,7 +47,7 @@ class NodeQB {
         return this._createNewInstance();
     }
 
-    get(callback?: queryCallback) {
+    get(callback?: mysqlCustomQueryCallback) {
         return this._exec({callback});
     }
 
@@ -390,19 +386,23 @@ class NodeQB {
 
     private async _exec(props: ExecInterface) {
         const {callback, returnMode = 'default', value} = props;
+
         this._instance._queryOptionsBuild();
         const queryMode = returnModeObj[returnMode];
         if (callback) {
-            this._instance[queryMode].apply(this._instance, [{options: this._instance._queryOptions, callback, value}]);
+            return this._instance[queryMode].call(this._instance, {
+                options: this._instance._queryOptions,
+                callback,
+                value
+            });
         } else {
-            return this._instance[queryMode].apply(this._instance, [
-                {
-                    options: this._instance._queryOptions,
-                    callback,
-                    value,
-                },
-            ]);
+            return this._instance[queryMode].call(this._instance, {
+                options: this._instance._queryOptions,
+                callback,
+                value,
+            })
         }
+
     }
 
     private _columnPrepare(columns: any) {

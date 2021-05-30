@@ -1,23 +1,6 @@
-import mysql, {Connection, FieldInfo, MysqlError, PoolConnection, queryCallback, QueryOptions} from 'mysql';
-import {config, method, NodeQBConnectionInterface, ReturnModeTypes} from '../../types/typeInterface';
-import {devConsoleLog, spaceRemover} from '../../helper/basicHelper';
-
-interface MysqlQueryMethod {
-    options: QueryOptions;
-    callback?: queryCallback;
-    returnMode?: ReturnModeTypes;
-    value?: any;
-}
-
-interface QueryExec {
-    connection: PoolConnection | Connection;
-    resolve: any;
-    reject: any;
-    callback: any;
-    options: any;
-    returnMode?: ReturnModeTypes;
-    value?: string;
-}
+import mysql, {Connection, FieldInfo, MysqlError, PoolConnection, QueryOptions} from 'mysql';
+import {config, method, MysqlErrorCustom, MysqlQueryMethod, NodeQBConnectionInterface, QueryExec} from '../types';
+import {errorTypeAdd, queryErrorThrower, spaceRemover} from '../helper';
 
 class MysqlConnection {
     _sql: string | undefined;
@@ -72,18 +55,17 @@ class MysqlConnection {
         }
     }
 
-    createConnection(callback?: (err: MysqlError) => void): Promise<MysqlConnection> {
+    createConnection() {
         return new Promise((resolve, reject) => {
             this._conn.connect((err: MysqlError) => {
                 if (err) {
-                    devConsoleLog(err.sqlMessage);
-                    reject(err);
+                    reject(err)
                     return;
                 }
                 this._connectStatus = true;
                 resolve(this._conn);
-            });
-        });
+            })
+        })
     }
 
     createPool() {
@@ -91,31 +73,40 @@ class MysqlConnection {
             this._conn.getConnection((err: MysqlError, connection: PoolConnection): void => {
                 if (err) {
                     reject(err);
-                } else {
-                    resolve(connection);
+                    return
                 }
+                resolve(connection)
             });
-        });
+        })
     }
 
     _query(props: MysqlQueryMethod) {
         const {callback, options, returnMode, value} = props;
         return new Promise((resolve, reject) => {
             if (this._method === 'pool') {
-                this.createPool().then((connection: any) => {
-                    this._queryExec({connection, reject, resolve, callback, options, returnMode, value});
-                });
+                this.createPool().then((poolConnection: any) => {
+                    this._queryExec({
+                        connection: poolConnection,
+                        reject,
+                        resolve,
+                        callback,
+                        options,
+                        returnMode,
+                        value
+                    });
+                }).catch((e: MysqlErrorCustom) => {
+                    reject(errorTypeAdd(e, "connection"))
+                })
             } else {
-                this.createConnection((err) => {
-                    if (err) {
-                        devConsoleLog(err.sqlMessage);
-                        reject(err);
-                        return;
-                    }
-                    this._queryExec({connection: this._conn, reject, resolve, callback, options, returnMode, value});
-                });
+                this.createConnection().then((connection: any) => {
+                    this._queryExec({connection, reject, resolve, callback, options, returnMode, value})
+                }).catch((e: MysqlErrorCustom) => {
+                    reject(errorTypeAdd(e, "connection"))
+                })
             }
-        });
+        }).catch((e: MysqlErrorCustom) => {
+            queryErrorThrower(e, callback, (e?.errorType ? e.errorType : "query"))
+        })
     }
 
     _singleQuery(props: MysqlQueryMethod) {
@@ -174,33 +165,11 @@ class MysqlConnection {
         return spaceRemover(str);
     }
 
-    private _value(value?: any) {
-        return (res?: any) => {
-            if (typeof value !== undefined) {
-                return res;
-            }
-            let values: any[] = [];
-            if (Array.isArray(value)) {
-                values = value;
-            } else {
-                values = value.split(' ').join(',').split(',');
-            }
-            const filterResult: any = {};
-            values.forEach((a: string) => {
-                filterResult[a] = res[a];
-            });
-            return filterResult;
-        };
-    }
-
     private _queryExec(props: QueryExec) {
         const {connection, options, returnMode, reject, value, callback, resolve} = props;
         connection.query(options, (err: MysqlError, results: any, field: FieldInfo[]) => {
             if (err) {
-                if (callback) {
-                    callback(err);
-                }
-                reject(err);
+                reject(err)
                 return;
             }
             if (this._method === 'pool') {
@@ -221,8 +190,28 @@ class MysqlConnection {
                 callback(err, res, field);
             }
             resolve(res);
-        });
+        })
     }
+
+    private _value(value?: any) {
+        return (res?: any) => {
+            if (typeof value !== undefined) {
+                return res;
+            }
+            let values: any[] = [];
+            if (Array.isArray(value)) {
+                values = value;
+            } else {
+                values = value.split(' ').join(',').split(',');
+            }
+            const filterResult: any = {};
+            values.forEach((a: string) => {
+                filterResult[a] = res[a];
+            });
+            return filterResult;
+        };
+    }
+
 }
 
 export default MysqlConnection;
