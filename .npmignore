@@ -1,7 +1,7 @@
-src
-tsconfig.json
-tslint.json
-.idea
-test.js
+/src
+/tsconfig.json
+/tslint.json
+/.idea
+/test.js
 /index.ts
 /.gitignore
