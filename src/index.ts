@@ -7,7 +7,7 @@ import {
     ReturnModeObjInterface,
 } from './types';
 import MysqlConnection from './database/mysql';
-import {ConnectionConfig, PoolConfig} from 'mysql';
+import mysql, {ConnectionConfig, PoolConfig} from 'mysql';
 import {spaceRemover} from './helper';
 
 const op = ['>', '<', '>=', '<=', '!=', '=', 'like'];
@@ -42,8 +42,25 @@ class NodeQB {
         }
     }
 
-    create() {
-        return this._createNewInstance();
+    create = () => this._createNewInstance();
+    format = (a: any, b: any) => {
+        return this._instance.format(a, b)
+    }
+
+    escapeAll(a: any) {
+        let res: any;
+        if (a instanceof Object) {
+            if (Array.isArray(a)) {
+                res = a.map(val => mysql.escape(val))
+            } else {
+                res = Object.fromEntries(Object.entries(a).map((arr: any[]) => {
+                    return this.escapeAll(arr)
+                }))
+            }
+        } else {
+            res = mysql.escape(a)
+        }
+        return res
     }
 
     get(callback?: mysqlCustomQueryCallback) {
@@ -59,12 +76,12 @@ class NodeQB {
         return this._exec({callback, returnMode: 'single', value: 'c'});
     }
 
-    value(columName: string) {
+    value = (columName: string) => {
         this._instance._limit = 'limit 1';
         return this._exec({returnMode: 'single', value: columName});
-    }
+    };
 
-    pluck(key: string, value?: string) {
+    pluck = (key: string, value?: string) => {
         if (!key) {
             return;
         }
@@ -73,9 +90,12 @@ class NodeQB {
         this._instance._select = ` ${keyName} as keyColumn, ${valueName} as valueColumn `;
         return this._exec({}).then((res) => {
             return res.reduce(
-                (acc: any, {keyColumn, valueColumn}: { keyColumn: any; valueColumn: any }) => (acc[keyColumn] = valueColumn, acc), {});
+                (acc: any, {
+                    keyColumn,
+                    valueColumn
+                }: { keyColumn: any; valueColumn: any }) => (acc[keyColumn] = valueColumn, acc), {});
         });
-    }
+    };
 
     table(tableName: string): NodeQB {
         this._instance.init();
@@ -83,9 +103,7 @@ class NodeQB {
         return this;
     }
 
-    primary() {
-        return this._instance.getPrimary();
-    }
+    primary = () => this._instance.getPrimary();
 
     getQuery(): string {
         return spaceRemover(this._instance.getSql());
@@ -106,8 +124,10 @@ class NodeQB {
         return this;
     }
 
+
     groupBy(...columns: Array<string> | any): NodeQB {
-        this._instance._group = ` GROUP BY ${NodeQB._columnPrepare(columns)}`;
+        columns = this.escapeAll(columns)
+        this._instance._group = ` GROUP BY ${this._columnPrepare(columns)}`;
         return this;
     }
 
@@ -126,34 +146,34 @@ class NodeQB {
     select(...columns: Array<string> | any): NodeQB {
         let select = '';
         if (columns[0]) {
-            select = ' ' + NodeQB._columnPrepare(columns);
+            select = ' ' + this._columnPrepare(columns);
         }
         this._instance._select = select;
         return this;
     }
 
     selectRaw(str: string, values: any[] = []): NodeQB {
-        this._instance._select = ` ${this._instance.format(str, values)}`;
+        this._instance._select = ` ${this.format(str, values)}`;
         return this;
     }
 
     whereRaw(str: string, values: any[] = []): NodeQB {
-        this._instance._where = `WHERE ${this._instance.format(str, values)}`;
+        this._instance._where = `WHERE ${this.format(str, values)}`;
         return this;
     }
 
     havingRaw(str: string, values: any[] = []): NodeQB {
-        this._instance._having = `HAVING ${this._instance.format(str, values)}`;
+        this._instance._having = `HAVING ${this.format(str, values)}`;
         return this;
     }
 
     orderByRaw(str: string, values: any[] = []): NodeQB {
-        this._instance._order = `ORDER ${this._instance.format(str, values)}`;
+        this._instance._order = `ORDER ${this.format(str, values)}`;
         return this;
     }
 
     groupByRaw(str: string, values: any[] = []): NodeQB {
-        this._instance._order = `GROUP BY ${this._instance.format(str, values)}`;
+        this._instance._order = `GROUP BY ${this.format(str, values)}`;
         return this;
     }
 
@@ -163,11 +183,11 @@ class NodeQB {
     }
 
     async max(column: string) {
-        return await this.select(` max(${column}) as max`).value('max');
+        return await this.select(` max(${column}) as m`).value('m');
     }
 
     async min(column: string) {
-        return await this.select(` min(${column}) as min`).value('min');
+        return await this.select(` min(${column}) as m`).value('m');
     }
 
     async sum(column: string) {
@@ -176,8 +196,8 @@ class NodeQB {
 
     avg(...columns: Array<string> | any) {
         let col = columns.flat().join('+');
-        this._instance._select = ` avg(${col}) as avg`;
-        return this._exec({returnMode: 'single', value: 'avg'});
+        this._instance._select = ` avg(${col}) as av`;
+        return this._exec({returnMode: 'single', value: 'av'});
     }
 
     where(...columns: any[]) {
@@ -201,27 +221,27 @@ class NodeQB {
     }
 
     whereDate(column: string, value: string | number): NodeQB {
-        this._instance._where += ` DATE(${column})= ${value}`;
+        this._instance._where += ` DATE(${column})= ${this._instance._escape(value)}`;
         return this;
     }
 
     whereDay(column: string, value: string | number): NodeQB {
-        this._instance._where += ` DAY(${column})= ${value}`;
+        this._instance._where += ` DAY(${column})= ${this._instance._escape(value)}`;
         return this;
     }
 
     whereTime(column: string, value: string | number): NodeQB {
-        this._instance._where += ` TIME(${column})= ${value}`;
+        this._instance._where += ` TIME(${column})= ${this._instance._escape(value)}`;
         return this;
     }
 
     whereYear(column: string, value: string | number): NodeQB {
-        this._instance._where += ` YEAR(${column})= ${value}`;
+        this._instance._where += ` YEAR(${column})= ${this._instance._escape(value)}`;
         return this;
     }
 
     whereMonth(column: string, value: string | number): NodeQB {
-        this._instance._where += ` MONTH(${column})= ${value}`;
+        this._instance._where += ` MONTH(${column})= ${this._instance._escape(value)}`;
         return this;
     }
 
@@ -281,12 +301,12 @@ class NodeQB {
     }
 
     limit(number: number): NodeQB {
-        this._instance._limit = `LIMIT ${number}`;
+        this._instance._limit = `LIMIT ${this._instance._escape(number)}`;
         return this;
     }
 
     offset(number: number): NodeQB {
-        this._instance._offset = `OFFSET ${number}`;
+        this._instance._offset = `OFFSET ${this._instance._escape(number)}`;
         return this;
     }
 
@@ -398,21 +418,21 @@ class NodeQB {
 
     }
 
-    private static _columnPrepare(columns: any) {
+    private _columnPrepare = (columns: any[]) => {
         if (typeof columns !== 'undefined' && Array.isArray(columns)) {
             return columns.flat().join(', ');
         }
         return '';
-    }
+    };
 
     private _order(columns: Array<string> | any, sort: 'ASC' | 'DESC'): NodeQB {
         let col: string = '';
         if (typeof columns !== 'undefined' && columns[0]) {
-            col = `ORDER BY  ${NodeQB._columnPrepare(columns)} ${sort}`;
+            col = `ORDER BY  ${this._columnPrepare(columns)} ${sort}`;
         } else {
             let orderColumn = this._instance._defaults?.orderColumn;
             if (orderColumn) {
-                col = `ORDER BY  ${NodeQB._columnPrepare([orderColumn])} ${sort}`;
+                col = `ORDER BY  ${this._columnPrepare([orderColumn])} ${sort}`;
             }
         }
         this._instance._order = col;
@@ -423,7 +443,7 @@ class NodeQB {
         if (typeof columns !== 'undefined' && Array.isArray(columns)) {
             const [k, v] = columns;
             let kn = op.some((a) => k.indexOf(a) > -1) ? k.replace(/(\w+)(.*)/g, '`$1` $2') : `\`${k}\` =`;
-            let vn = typeof v === 'string' ? `'${v}'` : v;
+            let vn = typeof v === 'string' ? `${this._instance._escape(v)}` : this._instance._escape(v);
             return [kn, vn].join(' ');
         }
         return '';
@@ -432,24 +452,20 @@ class NodeQB {
     private _whereArrayPrepare(columns: any): string {
         let [column, secArg, thirdArg] = columns;
         let str: string = '';
-        column = NodeQB._prepareKey(column);
-        thirdArg = NodeQB._prepareValue(thirdArg);
+        column = this._prepareKey(column);
+        thirdArg = this._prepareValue(thirdArg);
         if (op.some((a) => a === secArg)) {
             str = [column, secArg, thirdArg].join(' ');
         } else {
-            secArg = NodeQB._prepareValue(secArg);
+            secArg = this._prepareValue(secArg);
             str = [column, secArg].join(' = ');
         }
         return str;
     }
 
-    private static _prepareValue(val: any) {
-        return typeof val === 'string' ? `'${val}'` : val;
-    }
+    private _prepareValue = (val: any) => typeof val === 'string' ? `${this._instance._escape(val)}` : val;
 
-    private static _prepareKey(col: any) {
-        return `\`${col}\``;
-    }
+    private _prepareKey = (col: any) => `\`${col}\``;
 
     private _conditionPrepare(columns: columns, sepreator: string = 'AND') {
         let str: string = '';
@@ -489,7 +505,7 @@ class NodeQB {
     }
 
     private _in(column: string, values: any[] | string = [], cond: Condition, mode: string = ''): NodeQB {
-        let val = Array.isArray(values) ? values.join(',') : values;
+        let val = Array.isArray(values) ? this.escapeAll(values).join(',') : this._instance._escape(values);
         const condWord = this._instance._where ? cond : '';
         this._instance._where += ` ${condWord} ${column} ${mode} IN (${val})`;
         return this;
@@ -515,6 +531,5 @@ class NodeQB {
         return this;
     };
 }
-
 
 export = NodeQB

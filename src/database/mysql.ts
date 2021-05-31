@@ -144,6 +144,10 @@ class MysqlConnection {
         return mysql.format(str, value);
     }
 
+    _escape(a:any|any[]):void|string {
+        return mysql.escape(a);
+    }
+
     getSql(): string {
         let str = '';
         this._where = this._where ? `WHERE ${this._where.toString().replace('WHERE', '')}` : '';
