@@ -73,7 +73,7 @@ prefer use `table()` call on first. It will reset the previous query value
 we are supporting both await and callback method
 ```javascript
 const result =await db.table('tableName').get();
-console.log(query) //you will get result 
+console.log(result) //you will get result 
 
 //or
 
@@ -83,6 +83,41 @@ db.table('tableName').get((err,results,fields)=>{
    }
    console.log(results) //you will get result
 })
+```
+
+## Error Handling
+You could handle the all error via catch function as well callback
+
+checkout the [Error response object](https://www.npmjs.com/package/mysql#error-handling)
+
+In error object. we have one custom key for detecting error type
+```javascript
+ err.errorType // "connection"|"query" 
+```
+* connection -> `connection failure error`
+* query      -> `query related errors`
+
+```javascript
+//Callback error
+db.table('tableName').get((err,results,fields)=>{
+   if (err){  
+      console.log(err.errorType) //you got the error type
+      return
+   }
+   console.log(results) //you will get result
+})
+
+//Catch error for using await
+const result =await db.table('tableName').get().catch(err=>{
+   if (err){
+      console.log(err.errorType) //you got the error type
+   }
+})
+console.log(result) //while got error this undefined
+
+if (result){
+   //do stuff here
+}
 ```
 
 ## Methods
