@@ -135,7 +135,7 @@ class MysqlConnection {
         });
     }
 
-    _generateSql(get?: boolean): MysqlConnection {
+    _generateSql(): MysqlConnection {
         this._sql = this.getSql();
         return this;
     }
@@ -214,4 +214,4 @@ class MysqlConnection {
 
 }
 
-export default MysqlConnection;
+export = MysqlConnection;

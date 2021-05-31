@@ -24,18 +24,17 @@ const returnModeObj: ReturnModeObjInterface = {
 };
 
 class NodeQB {
-    private _instance: MysqlConnection;
-    private _dbType: 'mysql';
-    private _config: ConnectionConfig & PoolConfig;
+    private readonly _instance: MysqlConnection;
+    private readonly _dbType: 'mysql';
+    private readonly _config: ConnectionConfig & PoolConfig;
     private _prevent: boolean | undefined;
 
-    constructor({type, defaults, config, method, prevent}: NodeQBConnectionInterface.Constructor) {
+    constructor({type, defaults, config, method, prevent}: NodeQBConnectionInterface.ConstructorFunction) {
         this._dbType = type;
         this._config = config;
         this._prevent = prevent;
         if (typeof connectionDB[type] === 'undefined') {
             throw new Error(`Invalid type connection name ${type}`);
-            return;
         }
         this._instance = connectionDB[type]();
         if (!prevent) {
@@ -74,11 +73,7 @@ class NodeQB {
         this._instance._select = ` ${keyName} as keyColumn, ${valueName} as valueColumn `;
         return this._exec({}).then((res) => {
             return res.reduce(
-                (acc: any, {keyColumn, valueColumn}: { keyColumn: any; valueColumn: any }) => (
-                    (acc[keyColumn] = valueColumn), acc
-                ),
-                {},
-            );
+                (acc: any, {keyColumn, valueColumn}: { keyColumn: any; valueColumn: any }) => (acc[keyColumn] = valueColumn, acc), {});
         });
     }
 
@@ -112,19 +107,17 @@ class NodeQB {
     }
 
     groupBy(...columns: Array<string> | any): NodeQB {
-        this._instance._group = ` GROUP BY ${this._columnPrepare(columns)}`;
+        this._instance._group = ` GROUP BY ${NodeQB._columnPrepare(columns)}`;
         return this;
     }
 
     oldest(...columns: Array<string>): NodeQB {
-        let col: string | any = '';
         this.orderByAsc(...columns);
         this._instance._limit = 'LIMIT 1';
         return this;
     }
 
     latest(...columns: Array<string>): NodeQB {
-        let col: string | any = '';
         this.orderByDesc(...columns);
         this._instance._limit = 'LIMIT 1';
         return this;
@@ -133,7 +126,7 @@ class NodeQB {
     select(...columns: Array<string> | any): NodeQB {
         let select = '';
         if (columns[0]) {
-            select = ' ' + this._columnPrepare(columns);
+            select = ' ' + NodeQB._columnPrepare(columns);
         }
         this._instance._select = select;
         return this;
@@ -405,10 +398,9 @@ class NodeQB {
 
     }
 
-    private _columnPrepare(columns: any) {
+    private static _columnPrepare(columns: any) {
         if (typeof columns !== 'undefined' && Array.isArray(columns)) {
-            const col = columns.flat().join(', ');
-            return col;
+            return columns.flat().join(', ');
         }
         return '';
     }
@@ -416,11 +408,11 @@ class NodeQB {
     private _order(columns: Array<string> | any, sort: 'ASC' | 'DESC'): NodeQB {
         let col: string = '';
         if (typeof columns !== 'undefined' && columns[0]) {
-            col = `ORDER BY  ${this._columnPrepare(columns)} ${sort}`;
+            col = `ORDER BY  ${NodeQB._columnPrepare(columns)} ${sort}`;
         } else {
             let orderColumn = this._instance._defaults?.orderColumn;
             if (orderColumn) {
-                col = `ORDER BY  ${this._columnPrepare([orderColumn])} ${sort}`;
+                col = `ORDER BY  ${NodeQB._columnPrepare([orderColumn])} ${sort}`;
             }
         }
         this._instance._order = col;
@@ -440,22 +432,22 @@ class NodeQB {
     private _whereArrayPrepare(columns: any): string {
         let [column, secArg, thirdArg] = columns;
         let str: string = '';
-        column = this._prepareKey(column);
-        thirdArg = this._prepareValue(thirdArg);
+        column = NodeQB._prepareKey(column);
+        thirdArg = NodeQB._prepareValue(thirdArg);
         if (op.some((a) => a === secArg)) {
             str = [column, secArg, thirdArg].join(' ');
         } else {
-            secArg = this._prepareValue(secArg);
+            secArg = NodeQB._prepareValue(secArg);
             str = [column, secArg].join(' = ');
         }
         return str;
     }
 
-    private _prepareValue(val: any) {
+    private static _prepareValue(val: any) {
         return typeof val === 'string' ? `'${val}'` : val;
     }
 
-    private _prepareKey(col: any) {
+    private static _prepareKey(col: any) {
         return `\`${col}\``;
     }
 
@@ -524,4 +516,5 @@ class NodeQB {
     };
 }
 
-export default NodeQB;
+
+export = NodeQB

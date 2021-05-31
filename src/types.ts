@@ -4,27 +4,6 @@ import MysqlConnection from './database/mysql';
 
 export type method = 'pool' | 'default';
 
-export namespace NodeQBConnectionInterface {
-    export interface Constructor {
-        type: keyof database;
-        config: config;
-        prevent?: boolean;
-        defaults?: defaults;
-        method?: method;
-    }
-
-    export interface database {
-        mysql: MysqlConnectionInterface;
-    }
-
-    export interface defaults {
-        orderColumn?: string | Array<string>;
-    }
-
-    export interface Join {
-        (joinTable: string, callbackOrId: any, condition?: string, secondaryId?: string, mode?: Joins): NodeQB;
-    }
-}
 export type config = ConnectionConfig & PoolConfig;
 export type Joins = 'INNER JOIN' | 'LEFT JOIN' | 'RIGHT JOIN';
 
@@ -78,3 +57,27 @@ export type ExecInterfaceSingleView = {
     callback?: mysqlCustomQueryCallback
     value: string;
 };
+
+
+export namespace NodeQBConnectionInterface {
+    export interface database {
+        mysql: MysqlConnectionInterface;
+    }
+
+    export interface defaults {
+        orderColumn?: string | Array<string>;
+    }
+
+    export interface ConstructorFunction {
+        type: keyof database;
+        config: config;
+        prevent?: boolean;
+        defaults?: defaults;
+        method?: method;
+    }
+
+
+    export interface Join {
+        (joinTable: string, callbackOrId: any, condition?: string, secondaryId?: string, mode?: Joins): NodeQB;
+    }
+}
