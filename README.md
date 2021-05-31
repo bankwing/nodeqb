@@ -19,7 +19,7 @@
 ```sh
 yarn add nodeqb
 #or
-node install nodeqb
+npm install nodeqb
 ```
 
 
@@ -124,7 +124,7 @@ if (result){
 
 >**Note:*** 
 All these type of `where`,`having` inputs escaped with mysql escape string method. So no need escape `string/object/callback` inside this method. 
-> If you are using escape again it in this method maybe you have query error
+> If you are using escape again in this method maybe you have query error
 
 If you need escape method
 ```javascript
