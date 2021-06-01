@@ -10,8 +10,6 @@
 
 > Query builder for node mysql. Inspired concept from laravel
 
-### Note: ***Still under testing. Don't use it on production***
-
 <br/>
 
 ## Install
@@ -152,6 +150,11 @@ console.log(query)
  **prasanth**
 
 * Github: [@prasanthreact](https://github.com/prasanthreact)
+
+## Contribute
+Got a missing feature you'd like to use? Found a bug? Go ahead and fork this repo, build the feature and issue a pull request.
+
+Feel free [raise a issue](https://github.com/prasanthreact/nodeqb/issues)
 
 ## Show your support
 
