@@ -68,7 +68,9 @@ prefer use `table()` call on first. It will reset the previous query value
 ```
 
 ## Await / callback
+
 we are supporting both await and callback method
+
 ```javascript
 //await -> sync method
 const result =await db.table('tableName').get();
@@ -135,7 +137,7 @@ If you need escape method
 
 ## Methods
 
-### **`.getQuery()`**
+**`.getQuery()`**
 
 Get the compiled final query output sql string
 ```javascript
@@ -143,24 +145,34 @@ const query = db.table('tableName').select('colA','colB').getQuery()
 console.log(query) 
 // SELECT colA,colB FROM tableName
 ```
+---
 
 ### GetRows methods
 
+
 **MultiRow**
-### **`.get()`**  `-> await/callback` `=>[]`
+
+`.get()`  `-> await/callback` `=>[]`
+
 returning multiple row array response
 
 **SingleRow**
-### **`.first()`**  `-> await/callback` `=>{}`
+
+`.first()` `-> await/callback` `=>{}`
+
 returning single row object response
  ```javascript
  db.table('tableName').first()
 //SELECT * FROM tableName LIMIT 1
 ```
 
+---
 
 ### WHERE
-### **`.where(), .orWhere(), .having(), .orHaving()`**
+
+**`.where()`,` .orWhere()`,` .having()`,` .orHaving()`**
+
+
 All below usages are supported above method
 
 Params Methods
@@ -171,27 +183,32 @@ Params Methods
 
 #### condition  `supported ['>', '<', '>=', '<=', '!=', '=', 'like'] `
 
----
+
+
 #### _Single Condition_
+
 ```javascript
 //Syntax
 db.table('tableName').where('columName','condition','value').get()
 ```
+
 ```javascript
 //usage
 db.table('tableName').where('someColum','>','someValue').get()
 //#or
+//array method
 db.table('tableName').where(['someColum','>','someValue']).get()
 
 //SELECT * FROM tableName WHERE `someColumn` > 'someValue'
 ```
 
-condition is `=`.No need to add just two params if enough
+condition is `=`.No need to add condition just two params if enough
 
 ```javascript
 db.table('tableName').where('columName','value').get()
 //SELECT * FROM tableName WHERE `columName` = 'value'
 ```
+
 #### _Multi Condition_
 You could add the condition on key. All are `AND`
 ```javascript
@@ -203,6 +220,7 @@ db.table('tableName').where({
 
 //SELECT * FROM tableName WHERE `columName` = 'value' AND `columnId` > 10 AND `columnName` >= 'test' 
 ```
+
 #### Callback
 
 ```javascript
@@ -211,36 +229,44 @@ db.table('tableName').where({
  })
 //SELECT * FROM tableName WHERE `columName` = 'value' AND ( `name` = 'value' OR `name` = 100 )
 ```
-### _AND | OR_
+
+ #### AND | OR
 
 ```javascript
  db.table("tableName").where('columnName',"value").orWhere("columName",'!=',"value").get()
 //SELECT * FROM tableName WHERE `columnName` = 'value' OR `columName` != 'value'
 ```
-### **`.whereAnd(), .whereOR`**
+**`.whereAnd()`, `.whereOR`**
+
 it just concatenates the string on the chain. very rar case you could use this instead writing raw query
+
+---
 
 
 ### SELECT 
-### **`.select()`**
+**`.select()`**
+
 ```javascript
 db.table('tableName').select("colA","colB","colC","colD").get()
 //SELECT colA, colB, colC, colD FROM tableName
 ```
 
-### **`.addSelect()`**
+**`.addSelect()`**
+
 ```javascript
 db.table('tableName').select("colA","colB","colC").addSelect("colD").get()
 //SELECT colA, colB, colC, colD FROM tableName
 ```
 
-### **`.distinct()`**
+**`.distinct()`**
+
 ```javascript
 db.table('tableName').distinct("colD").get()
 //SELECT DISTINCT colD FROM tableName
 ```
 
-### **`.min()`, ` .max()`,` .sum()`,` .avg()`** `-> await`
+**`.min()`, ` .max()`,` .sum()`,` .avg()`** `-> await`
+
 ```javascript
 const res =  await db.table('tableName').max("colA");
 console.log(res) //received single value response string|number|undefined
@@ -249,9 +275,12 @@ console.log(res) //received single value response string|number|undefined
 
 
 ### Raw Queries
-### **`.selectRaw(), .whereRaw(), .havingRaw(), .orderByRaw(), .groupByRaw()`**
+
+**`.selectRaw(), .whereRaw(), .havingRaw(), .orderByRaw(), .groupByRaw()`**
+
 
 All below function same for all above methods
+
 ```javascript
 db.table('tableName').selectRaw("colA as a,ColB as b").get()
 //SELECT colA as a,ColB as b FROM tableName
@@ -266,9 +295,12 @@ db.table('tableName').whereRaw(" `colA`=? AND ? ",["colValue",{"name":"value"}])
 // SELECT * FROM tableName WHERE `colA`='colValue' AND `name` = 'value'
 ```
 
+---
 ### INSERT | UPDATE | DELETE
 
+
 Result value explanation [click here](https://www.npmjs.com/package/mysql#getting-the-id-of-an-inserted-row)
+
 ```typescript
  results = {
    fieldCount: number;
@@ -294,7 +326,7 @@ Result value explanation [click here](https://www.npmjs.com/package/mysql#gettin
 }
 ```
 
-### **`.insert()`**  `-> await/callback`
+**`.insert()`**  `-> await/callback`
 
 ```javascript
 //Syntax
@@ -309,16 +341,20 @@ db.table('tableName').insert({colA:"ColB"},(err, results, fields)=>{
 const res =await db.table('tableName').insert({colA:"ColB"})
 console.log(res.insertId)
 ```
-### **`.insertGetId()`**  `-> await`
+
+**`.insertGetId()`**  `-> await`
+
 you directly get last insert id
+
 ```javascript
 const res = await db.table('tableName').insertGetId({colA:"ColB"})
 console.log(res.insertId)
 ```
 
 
-### **`.update()`**  `-> await/callback`
-Same like insert only
+**`.update()`**  `-> await/callback`
+
+Same like insert 
 
 ```javascript
 //Syntax
@@ -333,8 +369,10 @@ db.table('tableName').update({colA:"ColB"},(err, results, fields)=>{
 const res =await db.table('tableName').update({colA:"ColB"})
 console.log(res.affectedRows)
 ```
-### **`.delete()`**  `-> await/callback`
-Same like insert only
+
+**`.delete()`**  `-> await/callback`
+
+Same like insert
 
 ```javascript
 //Syntax
@@ -350,12 +388,16 @@ const res =await db.table('tableName').delete()
 console.log(res.affectedRows)
 ```
 
+---
 #### Careful Methods
-### **`.drop(), .truncate()`**  `-> await/callback`
+
+**`.drop(), .truncate()`**  `-> await/callback`
+
 * drop -> `remove the table/database`
 * truncate -> `empty the table/database`
 
 Below snippet functions are same for above methods
+
 ```javascript
 //Syntax
 .drop(callback) 
