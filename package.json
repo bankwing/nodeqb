@@ -1,6 +1,6 @@
 {
   "name": "nodeqb",
-  "version": "1.5.1-beta",
+  "version": "1.5.2",
   "description": "Query builder for node mysql. Inspired concept from laravel",
   "keywords": [
     "mysql",
@@ -29,7 +29,9 @@
   "bugs": "https://github.com/prasanthreact/nodeqb/issues",
   "scripts": {
     "start": "ts-node-dev --respawn index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublish": "tsc",
+    "publish": "yarn publish"
   },
   "dependencies": {
     "@types/mysql": "^2.15.18",
