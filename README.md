@@ -168,7 +168,8 @@ returning single row object response
 
 ---
 
-### WHERE
+## WHERE
+
 
 **`.where()`,` .orWhere()`,` .having()`,` .orHaving()`**
 
@@ -181,9 +182,7 @@ Params Methods
 * **Object**        `{column:value} or {"columnWithCondition":value}`
 * **Callback**  `(query)=>  query.methods`
 
-#### condition  `supported ['>', '<', '>=', '<=', '!=', '=', 'like'] `
-
-
+**condition**  supported `['>', '<', '>=', '<=', '!=', '=', 'like']`
 
 #### _Single Condition_
 
@@ -243,7 +242,9 @@ it just concatenates the string on the chain. very rar case you could use this i
 ---
 
 
-### SELECT 
+## SELECT 
+
+
 **`.select()`**
 
 ```javascript
@@ -274,7 +275,8 @@ console.log(res) //received single value response string|number|undefined
 
 
 
-### Raw Queries
+## Raw Queries
+
 
 **`.selectRaw(), .whereRaw(), .havingRaw(), .orderByRaw(), .groupByRaw()`**
 
@@ -294,9 +296,46 @@ db.table('tableName').whereRaw(" `colA`=? AND ? ",["colValue",{"name":"value"}])
 
 // SELECT * FROM tableName WHERE `colA`='colValue' AND `name` = 'value'
 ```
+---
+## JOINS
+
+**`.join()`,`.letfJoin()`,`.rightJoin()`**
+
+Below snippet functions are same for above methods
+
+```javascript
+  //syntax 
+  .join("joinTable","joinTable.columnName | function","condition","tableName.columnName")
+
+//usage
+ db.table("tableName").join('secTable',"secTable._id","=","tableName.primaryId")
+// SELECT * FROM tableName INNER JOIN secTable ON secTable._id = tableName.primaryId 
+```
+
+ **Callback** method like where
+```javascript
+db.table("tableName").join('secTb',(q)=>{
+   return q.onJoin('secTb.id','>',"user_id").andJoin("secTb.name","tableName.primaryId")
+}).get()
+// SELECT * FROM tableName INNER JOIN secTb ON `secTb.id` > 'user_id' AND `secTb.name` = 'tableName.primaryId'
+```
+
+`.onJoin()`,` .orJoin()`,`.andJoin()`
+
+Purpose of the method used inside the callback of join methods
+```javascript
+db.table("tableName").join('secTb',(q)=>{
+   return q.onJoin('secTb.id','>',"user_id").andJoin("secTb.name","tableName.primaryId")
+}).get()
+// SELECT * FROM tableName INNER JOIN secTb ON `secTb.id` > 'user_id' AND `secTb.name` = 'tableName.primaryId'
+
+//#or
+db.table("tableName").join('secTb',"tableName.id",'=','secTb.id').orJoin('tableName.name','secTb.name').get()
+// SELECT * FROM tableName INNER JOIN secTb ON tableName.id = secTb.id OR `tableName.name` = 'secTb.name'
+```
 
 ---
-### INSERT | UPDATE | DELETE
+## INSERT | UPDATE | DELETE
 
 
 Result value explanation [click here](https://www.npmjs.com/package/mysql#getting-the-id-of-an-inserted-row)
@@ -371,8 +410,6 @@ console.log(res.affectedRows)
 ```
 
 **`.delete()`**  `-> await/callback`
-
-Same like insert
 
 ```javascript
 //Syntax
