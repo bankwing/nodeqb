@@ -172,16 +172,16 @@ class MysqlConnection {
     private _queryExec(props: QueryExec) {
         const {connection, options, returnMode, reject, value, callback, resolve} = props;
         connection.query(options, (err: MysqlError, results: any, field: FieldInfo[]) => {
-            if (err) {
-                reject(err)
-                return;
-            }
             if (this._method === 'pool') {
                 if ('release' in connection) {
                     connection.release();
                 }
             } else {
                 this._conn.destroy();
+            }
+            if (err) {
+                reject(err)
+                return;
             }
             let res: any = results;
             if (returnMode) {
