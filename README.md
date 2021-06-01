@@ -67,14 +67,16 @@ prefer use `table()` call on first. It will reset the previous query value
  db.table('tableName').get()
 ```
 
-### Await / callback
+## Await / callback
 we are supporting both await and callback method
 ```javascript
+//await -> sync method
 const result =await db.table('tableName').get();
 console.log(result) //you will get result 
 
 //or
 
+//callback async method
 db.table('tableName').get((err,results,fields)=>{
    if (err){
       return
@@ -142,6 +144,231 @@ console.log(query)
 // SELECT colA,colB FROM tableName
 ```
 
+### GetRows methods
+
+**MultiRow**
+### **`.get()`**  `-> await/callback` `=>[]`
+returning multiple row array response
+
+**SingleRow**
+### **`.first()`**  `-> await/callback` `=>{}`
+returning single row object response
+ ```javascript
+ db.table('tableName').first()
+//SELECT * FROM tableName LIMIT 1
+```
+
+
+### WHERE
+### **`.where(), .orWhere(), .having(), .orHaving()`**
+All below usages are supported above method
+
+Params Methods
+* **Single Condition**  `(column,condition,value) or (column,value)`
+* **Array** `[Single condition]`
+* **Object**        `{column:value} or {"columnWithCondition":value}`
+* **Callback**  `(query)=>  query.methods`
+
+#### condition  `supported ['>', '<', '>=', '<=', '!=', '=', 'like'] `
+
+---
+#### _Single Condition_
+```javascript
+//Syntax
+db.table('tableName').where('columName','condition','value').get()
+```
+```javascript
+//usage
+db.table('tableName').where('someColum','>','someValue').get()
+//#or
+db.table('tableName').where(['someColum','>','someValue']).get()
+
+//SELECT * FROM tableName WHERE `someColumn` > 'someValue'
+```
+
+condition is `=`.No need to add just two params if enough
+
+```javascript
+db.table('tableName').where('columName','value').get()
+//SELECT * FROM tableName WHERE `columName` = 'value'
+```
+#### _Multi Condition_
+You could add the condition on key. All are `AND`
+```javascript
+db.table('tableName').where({
+   columName:"value",
+   "columnId>":10,
+   "columnName>=":"test"
+}).get()
+
+//SELECT * FROM tableName WHERE `columName` = 'value' AND `columnId` > 10 AND `columnName` >= 'test' 
+```
+#### Callback
+
+```javascript
+ db.table("tableName").where("columName","value").where((q)=>{
+    return q.where("name","value").orWhere("name",100)
+ })
+//SELECT * FROM tableName WHERE `columName` = 'value' AND ( `name` = 'value' OR `name` = 100 )
+```
+### _AND | OR_
+
+```javascript
+ db.table("tableName").where('columnName',"value").orWhere("columName",'!=',"value").get()
+//SELECT * FROM tableName WHERE `columnName` = 'value' OR `columName` != 'value'
+```
+### **`.whereAnd(), .whereOR`**
+it just concatenates the string on the chain. very rar case you could use this instead writing raw query
+
+
+### SELECT 
+### **`.select()`**
+```javascript
+db.table('tableName').select("colA","colB","colC","colD").get()
+//SELECT colA, colB, colC, colD FROM tableName
+```
+
+### **`.addSelect()`**
+```javascript
+db.table('tableName').select("colA","colB","colC").addSelect("colD").get()
+//SELECT colA, colB, colC, colD FROM tableName
+```
+
+### **`.distinct()`**
+```javascript
+db.table('tableName').distinct("colD").get()
+//SELECT DISTINCT colD FROM tableName
+```
+
+### **`.min()`, ` .max()`,` .sum()`,` .avg()`** `-> await`
+```javascript
+const res =  await db.table('tableName').max("colA");
+console.log(res) //received single value response string|number|undefined
+```
+
+
+
+### Raw Queries
+### **`.selectRaw(), .whereRaw(), .havingRaw(), .orderByRaw(), .groupByRaw()`**
+
+All below function same for all above methods
+```javascript
+db.table('tableName').selectRaw("colA as a,ColB as b").get()
+//SELECT colA as a,ColB as b FROM tableName
+```
+**For Better** we recommended to use query formatter instead of raw string. Escape string already included with this method.
+
+You could match the `string|number|{key:value}` 
+>Object not support multiple iteration only single key value pair is enough like below example
+```javascript
+db.table('tableName').whereRaw(" `colA`=? AND ? ",["colValue",{"name":"value"}]).get()
+
+// SELECT * FROM tableName WHERE `colA`='colValue' AND `name` = 'value'
+```
+
+### INSERT | UPDATE | DELETE
+
+Result value explanation [click here](https://www.npmjs.com/package/mysql#getting-the-id-of-an-inserted-row)
+```typescript
+ results = {
+   fieldCount: number;
+   /**
+    * The number of affected rows from an insert, update, or delete statement.
+    */
+   affectedRows: number;
+   /**
+    * The insert id after inserting a row into a table with an auto increment primary key.
+    */
+   insertId: number;
+   serverStatus?: number;
+   warningCount?: number;
+   /**
+    * The server result message from an insert, update, or delete statement.
+    */
+   message: string;
+   /**
+    * The number of changed rows from an update statement. "changedRows" differs from "affectedRows" in that it does not count updated rows whose values were not changed.
+    */
+   changedRows: number;
+   protocol41: boolean;
+}
+```
+
+### **`.insert()`**  `-> await/callback`
+
+```javascript
+//Syntax
+.insert(object,callback) 
+
+//async
+db.table('tableName').insert({colA:"ColB"},(err, results, fields)=>{
+   console.log(results.insertId)
+})
+
+//sync
+const res =await db.table('tableName').insert({colA:"ColB"})
+console.log(res.insertId)
+```
+### **`.insertGetId()`**  `-> await`
+you directly get last insert id
+```javascript
+const res = await db.table('tableName').insertGetId({colA:"ColB"})
+console.log(res.insertId)
+```
+
+
+### **`.update()`**  `-> await/callback`
+Same like insert only
+
+```javascript
+//Syntax
+.update(object,callback) 
+
+//async
+db.table('tableName').update({colA:"ColB"},(err, results, fields)=>{
+   console.log(results.affectedRows)
+})
+
+//sync
+const res =await db.table('tableName').update({colA:"ColB"})
+console.log(res.affectedRows)
+```
+### **`.delete()`**  `-> await/callback`
+Same like insert only
+
+```javascript
+//Syntax
+.delete(callback) 
+
+//async
+db.table('tableName').where("colA",100).delete((err, results, fields)=>{
+   console.log(results.affectedRows)
+})
+
+//sync
+const res =await db.table('tableName').delete()
+console.log(res.affectedRows)
+```
+
+#### Careful Methods
+### **`.drop(), .truncate()`**  `-> await/callback`
+* drop -> `remove the table/database`
+* truncate -> `empty the table/database`
+
+Below snippet functions are same for above methods
+```javascript
+//Syntax
+.drop(callback) 
+
+//async
+db.table('tableName').drop((err, results, fields)=>{
+   console.log(results)
+})
+
+//sync
+const res =await db.table('tableName').drop()
+console.log(res)
+```
 
 ***We will update the other documentation soon...***
 

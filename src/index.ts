@@ -126,7 +126,6 @@ class NodeQB {
 
 
     groupBy(...columns: Array<string> | any): NodeQB {
-        columns = this.escapeAll(columns)
         this._instance._group = ` GROUP BY ${this._columnPrepare(columns)}`;
         return this;
     }
