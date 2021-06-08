@@ -200,19 +200,19 @@ class NodeQB {
     }
 
     where(...columns: any[]) {
-        return this._conditionCallback(columns.flat(), 'AND');
+        return columns.length === 0 ? this : this._conditionCallback(columns.flat(), 'AND');
     }
 
     orWhere(...columns: any[]) {
-        return this._conditionCallback(columns.flat(), 'OR');
+        return columns.length === 0 ? this : this._conditionCallback(columns.flat(), 'OR');
     }
 
     having(...columns: any[]) {
-        return this._conditionCallback(columns.flat(), 'AND', '_having', '_having');
+        return columns.length === 0 ? this : this._conditionCallback(columns.flat(), 'AND', '_having', '_having');
     }
 
     orHaving(...columns: any[]) {
-        return this._conditionCallback(columns.flat(), 'OR', '_having', '_having');
+        return columns.length === 0 ? this : this._conditionCallback(columns.flat(), 'OR', '_having', '_having');
     }
 
     whereColumn(...columns: any[]) {
