@@ -178,7 +178,7 @@ Quick way get the result. This will ignore the unnecessary columns from select. 
 On below method assume the `mail` column not available on table.While running force method invalid column removed on execution
 ```javascript
  await db.table('tableName').select('user_email',"mail","user_mobile").getForceSingle()
-//SELECT user_email FROM tableName
+//SELECT user_email,user_mobile FROM tableName
 ```
 
 ---
