@@ -1,6 +1,6 @@
 {
   "name": "nodeqb",
-  "version": "1.5.4-beta",
+  "version": "2.0.0-beta",
   "description": "Query builder for node mysql. Inspired concept from laravel",
   "keywords": [
     "mysql",
@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "@types/mysql": "^2.15.18",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "trim-newlines": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^15.6.0",
