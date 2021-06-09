@@ -1,6 +1,6 @@
 {
   "name": "nodeqb",
-  "version": "2.0.0-beta",
+  "version": "2.0.1-beta",
   "description": "Query builder for node mysql. Inspired concept from laravel",
   "keywords": [
     "mysql",
