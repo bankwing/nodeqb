@@ -144,7 +144,7 @@ class MysqlConnection {
         return mysql.format(str, value);
     }
 
-    _escape(a:any|any[]):void|string {
+    _escape(a: any | any[]): void | string {
         return mysql.escape(a);
     }
 
