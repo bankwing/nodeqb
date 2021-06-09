@@ -5,7 +5,7 @@ import {errorTypeAdd, queryErrorThrower, spaceRemover} from '../helper';
 class MysqlConnection {
     _sql: string | undefined;
     _queryOptions: QueryOptions | any;
-    _select: string | undefined;
+    _select: any[] | string | undefined;
     _defaults: NodeQBConnectionInterface.defaults | undefined;
     _table: string | undefined;
     _where: string | number | undefined;

@@ -135,7 +135,7 @@ If you need escape method
 
 
 
-## Methods
+# Methods
 
 **`.getQuery()`**
 
@@ -164,6 +164,21 @@ returning single row object response
  ```javascript
  db.table('tableName').first()
 //SELECT * FROM tableName LIMIT 1
+```
+**ForceResult**
+
+`.getForce` `-> await/callback` `=>[]`
+`.getForceSingle` `-> await/callback` `=>{}`
+
+
+Quick way get the result. This will ignore the unnecessary columns from select. That means filter the table columns names with select columns
+
+>_Purpose of creation `GraphQL`_, we could this method instead of `select *` on graphql resolver
+
+On below method assume the `mail` column not available on table.While running force method invalid column removed on execution
+```javascript
+ await db.table('tableName').select('user_email',"mail","user_mobile").getForceSingle()
+//SELECT user_email FROM tableName
 ```
 
 ---
@@ -277,6 +292,17 @@ console.log(res) //received single value response string|number|undefined
 
 ## Raw Queries
 
+**`.raw()`**
+>Better avoid direct raw
+
+Support both formatter and plain string
+```javascript
+db.raw('select * from tableName').get()
+//#or
+db.raw('select * from ??',['tableName']).get()
+
+//SELECT * FROM tableName
+```
 
 **`.selectRaw(), .whereRaw(), .havingRaw(), .orderByRaw(), .groupByRaw()`**
 
@@ -296,6 +322,16 @@ db.table('tableName').whereRaw(" `colA`=? AND ? ",["colValue",{"name":"value"}])
 
 // SELECT * FROM tableName WHERE `colA`='colValue' AND `name` = 'value'
 ```
+>Note * :formatter method in `selectRaw`. Column wrapped with `'`single quote. you have query error. At the time use  `??` instead of the `?`
+>>//Error: You have an error in your SQL syntax; check
+
+**Solution**
+```javascript
+db.table('tableName').selectRaw("?? as name, ?? as email",['user_name','user_email']).get();
+//SELECT `user_name` as name, `user_email` as email FROM tableName
+```
+_if you have any query error you could check and do same like this `??`_
+
 ---
 ## JOINS
 
@@ -447,6 +483,14 @@ db.table('tableName').drop((err, results, fields)=>{
 //sync
 const res =await db.table('tableName').drop()
 console.log(res)
+```
+
+### Other getMethods
+
+`.getColumns` -> `await/Callback`=>`[]`
+```javascript
+const res = db.table('tableName').getColumns()
+//res = [{Field:ColumnName},...]
 ```
 
 ***We will update the other documentation soon...***

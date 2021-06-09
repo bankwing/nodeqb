@@ -67,8 +67,29 @@ class NodeQB {
         return this._exec({callback});
     }
 
+    getColumns = (callback?: mysqlCustomQueryCallback) => {
+        this._instance._sql = `SHOW COLUMNS FROM ${this._instance._table}`
+        return this._exec({callback});
+    }
+
     getAll(callback?: mysqlCustomQueryCallback) {
         return this._exec({callback});
+    }
+
+    async getForce(callback?: mysqlCustomQueryCallback) {
+        const cols = await this.getColumns().then(a => a.map(({Field}) => Field))
+        this._instance._sql = '';
+        const sel = (<string>this._instance._select).split(',').map(i => i.trim()).filter(a => cols.indexOf(a) > -1)
+        this.select(sel)
+        return this._exec({callback})
+    }
+
+    async getForceSingle(callback?: mysqlCustomQueryCallback) {
+        const cols = await this.getColumns().then(a => a.map(({Field}) => Field))
+        this._instance._sql = '';
+        const sel = (<string>this._instance._select).split(',').map(i => i.trim()).filter(a => cols.indexOf(a) > -1)
+        this.select(sel)
+        return this._exec({callback, returnMode: "single"})
     }
 
     count(callback?: mysqlCustomQueryCallback) {
@@ -153,6 +174,11 @@ class NodeQB {
 
     selectRaw(str: string, values: any[] = []): NodeQB {
         this._instance._select = ` ${this.format(str, values)}`;
+        return this;
+    }
+
+    raw(str: string, values: any[] = []): NodeQB {
+        this._instance._sql = `${this.format(str, values)}`;
         return this;
     }
 
