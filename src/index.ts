@@ -92,6 +92,19 @@ class NodeQB {
         return this._exec({callback, returnMode: "single"})
     }
 
+    async forceInsert(insertObject: object, callback?: mysqlCustomQueryCallback) {
+        const cols = await this.getColumns().then(a => a.map(({Field}) => Field))
+        this._instance._sql = '';
+        const filteredObject = Object.fromEntries(Object.entries(insertObject).filter(([a]) => cols.indexOf(a) > -1));
+        return this.insert(filteredObject, callback)
+    }
+    async forceUpdate(insertObject: object, callback?: mysqlCustomQueryCallback) {
+        const cols = await this.getColumns().then(a => a.map(({Field}) => Field))
+        this._instance._sql = '';
+        const filteredObject = Object.fromEntries(Object.entries(insertObject).filter(([a]) => cols.indexOf(a) > -1))
+       return this.update(filteredObject, callback)
+    }
+
     count(callback?: mysqlCustomQueryCallback) {
         this._instance._select = ' count(*) as c ';
         return this._exec({callback, returnMode: 'single', value: 'c'});

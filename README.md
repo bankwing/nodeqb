@@ -165,7 +165,7 @@ returning single row object response
  db.table('tableName').first()
 //SELECT * FROM tableName LIMIT 1
 ```
-**ForceResult**
+**ForceMethod**
 
 `.getForce` `-> await/callback` `=>[]`
 `.getForceSingle` `-> await/callback` `=>{}`
@@ -180,8 +180,18 @@ On below method assume the `mail` column not available on table.While running fo
  await db.table('tableName').select('user_email',"mail","user_mobile").getForceSingle()
 //SELECT user_email,user_mobile FROM tableName
 ```
-
 ---
+>
+>Available: _**v3.1.0**-Beta and above_ 
+
+`.forceInsert` `-> await/callback` `=>[]`
+
+`.forceUpdate` `-> await/callback` `=>{}`
+
+same like above method it will ignore unnecessary columns . For below example it will remove the `invalid_col`
+```javascript
+ await db.table('tableName').forceInsert({ 'user_email':'test@mail' ,"invalid_col":'test val'}).forceInsert()
+```
 
 ## WHERE
 
@@ -417,6 +427,7 @@ const res =await db.table('tableName').insert({colA:"ColB"})
 console.log(res.insertId)
 ```
 
+
 **`.insertGetId()`**  `-> await`
 
 you directly get last insert id
@@ -425,6 +436,9 @@ you directly get last insert id
 const res = await db.table('tableName').insertGetId({colA:"ColB"})
 console.log(res.insertId)
 ```
+
+>
+> **Warning :*** without `.where` it will affect the entire table
 
 
 **`.update()`**  `-> await/callback`
@@ -436,12 +450,12 @@ Same like insert
 .update(object,callback) 
 
 //async
-db.table('tableName').update({colA:"ColB"},(err, results, fields)=>{
+db.table('tableName').where('colB','>',10).update({colA:"ColB"},(err, results, fields)=>{
    console.log(results.affectedRows)
 })
 
 //sync
-const res =await db.table('tableName').update({colA:"ColB"})
+const res =await db.table('tableName').where('colB','>',10).update({colA:"ColB"})
 console.log(res.affectedRows)
 ```
 
@@ -457,7 +471,7 @@ db.table('tableName').where("colA",100).delete((err, results, fields)=>{
 })
 
 //sync
-const res =await db.table('tableName').delete()
+const res =await db.table('tableName').where("colA",100).delete()
 console.log(res.affectedRows)
 ```
 
