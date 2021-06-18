@@ -190,7 +190,7 @@ On below method assume the `mail` column not available on table.While running fo
 
 same like above method it will ignore unnecessary columns . For below example it will remove the `invalid_col`
 ```javascript
- await db.table('tableName').forceInsert({ 'user_email':'test@mail' ,"invalid_col":'test val'}).forceInsert()
+ await db.table('tableName').forceInsert({ 'user_email':'test@mail' ,"invalid_col":'test val'})
 ```
 
 ## WHERE
