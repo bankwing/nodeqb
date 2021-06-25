@@ -187,7 +187,7 @@ class MysqlConnection {
             if (returnMode) {
                 res = returnMode === 'insert' ? results : results[0];
                 if (value) {
-                    res = res[value];
+                    res = res?.[value] ?? null
                 }
             }
             if (callback) {
