@@ -31,7 +31,7 @@ const NodeQB = require("nodeqb");
 const db = new NodeQB({
     type: "mysql", //database type "mysql|mongo" 
     method: "pool", // preferred use pool method
-    defaults: {
+    defaults: {   //optional
         orderColumn: "createdAt" //for default ordering column -> optional
     },
     config: {
@@ -173,7 +173,7 @@ returning single row object response
 
 Quick way get the result. This will ignore the unnecessary columns from select. That means filter the table columns names with select columns
 
->_Purpose of creation `GraphQL`_, we could this method instead of `select *` on graphql resolver
+>_Purpose of creation `GraphQL`_, we could use this method instead of `select *` on graphql resolver
 
 On below method assume the `mail` column not available on table.While running force method invalid column removed on execution
 ```javascript
