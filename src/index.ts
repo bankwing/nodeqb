@@ -403,12 +403,12 @@ class NodeQB {
     };
 
     leftJoin: NodeQBConnectionInterface.Join = (...props): NodeQB => {
-        props.push('mode', 'LEFT JOIN');
+        props.push('LEFT JOIN');
         return this._joinPrepare(...props);
     };
 
     righJoin: NodeQBConnectionInterface.Join = (...props): NodeQB => {
-        props.push('mode', 'RIGHT JOIN');
+        props.push('RIGHT JOIN');
         return this._joinPrepare(...props);
     };
 
